@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coin Flip Challenge — the luck-only bracket party game</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Run an official Coin Flip Challenge at your next party. A bracket of pure luck with announcer commentary, nicknames, battle cries and a title for every place. Free.">
+<meta name="theme-color" content="#0E2B25">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Coin Flip Challenge">
+<meta property="og:description" content="No skill. All luck. Bring the family. A free bracket party game with a big-time announcer.">
+<meta property="og:url" content="https://coinflipchallenge.com/">
+<meta property="og:image" content="https://coinflipchallenge.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<div class="in">
+<nav>
+  <a class="brand" href="/"><img src="/icons/icon-192.png" alt="">Coin Flip Challenge</a>
+  <a class="btn small" href="/play/">Play now</a>
+</nav>
+
+<header class="hero">
+  <div>
+    <div class="eyebrow">Official bracket · luck only</div>
+    <h1>Nobody loses. <span>The coin does.</span></h1>
+    <p class="lead">Set up a bracket, hand your friends big-time nicknames, and let a coin decide everything. An announcer calls every flip. No skill, no excuses, and everyone gets a title.</p>
+    <div class="cta">
+      <a class="btn" href="/play/">Play in your browser</a>
+      <a class="btn ghost" href="#get-the-app">Get the app</a>
+    </div>
+  </div>
+  <div class="coinbox">
+    <button class="coin" id="coin" aria-label="Flip the coin"><span class="disc" id="disc">
+      <svg viewBox="0 0 200 200" aria-hidden="true"><defs><radialGradient id="g" cx=".32" cy=".28" r=".9"><stop offset="0" stop-color="#FFE9A3"/><stop offset=".48" stop-color="#E8B93E"/><stop offset="1" stop-color="#B5821B"/></radialGradient></defs><circle cx="100" cy="100" r="96" fill="url(#g)"/><circle cx="100" cy="100" r="78" fill="none" stroke="#C99A2B" stroke-width="8"/><path d="M100 48l13.7 28.7 31.5 4.1-23 21.9 5.9 31.2L100 118l-28.1 15.9 5.9-31.2-23-21.9 31.5-4.1z" fill="#5A3E06"/></svg>
+    </span></button>
+    <div class="res" id="res" aria-live="polite">Tap the coin</div>
+    <small>A real flip, powered by your device's secure random numbers.</small>
+  </div>
+</header>
+</div>
+
+<div class="in">
+<section id="how">
+  <div class="eyebrow">How it works</div>
+  <h2>Three minutes to a champion</h2>
+  <p class="sub">One phone, tablet or laptop runs the whole party. Put it on the TV and everyone watches.</p>
+  <div class="grid">
+    <div class="card"><div class="n">01</div><h3>Add the contestants</h3><p>Type in the names, add nicknames and battle cries, and an optional win and loss photo for each person.</p></div>
+    <div class="card"><div class="n">02</div><h3>Flip every match</h3><p>Let the app flip a big, slow, suspenseful coin, or flip a real one and tap the side that landed.</p></div>
+    <div class="card"><div class="n">03</div><h3>Crown everyone</h3><p>Fireworks for the champion, and a title for every place, all the way down to the last.</p></div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="eyebrow">What's inside</div>
+  <h2>Built for loud living rooms</h2>
+  <p class="sub">Everything is designed to be read from across the room.</p>
+  <div class="grid">
+    <div class="card"><h3>Announcer commentary</h3><p>Every flip gets play-by-play, with callouts for upsets, comebacks and the final.</p></div>
+    <div class="card"><h3>Play for every place</h3><p>Everyone plays every round, so you get exact standings from first to last and nobody is done after one loss.</p></div>
+    <div class="card"><h3>A title for every place</h3><p>"The Vault" for the person who never won, "Perfectly Balanced" for an even record. Edit them all.</p></div>
+    <div class="card"><h3>Photos and fireworks</h3><p>A victory photo launches fireworks. A loss photo gets a graceful moment.</p></div>
+    <div class="card"><h3>Digital or real coin</h3><p>A 4 to 7 second decelerating flip with a random length, or flip a real coin and tap the result.</p></div>
+    <div class="card"><h3>Private and offline</h3><p>No accounts, no ads, no tracking. It all stays on your device and works without Wi-Fi.</p></div>
+  </div>
+</section>
+
+<section id="get-the-app">
+  <div class="eyebrow">Beta</div>
+  <h2>Get the app</h2>
+  <p class="sub">The App Store and Google Play versions are on the way. Join the beta now and help us make it better. It's free.</p>
+  <div class="dl">
+    <div class="card"><span class="tag">iPhone &amp; iPad</span><h3>TestFlight beta</h3><p>Install Apple's free TestFlight app, then tap the button to join.</p><a class="btn" id="ios" href="#" aria-disabled="true">Coming soon</a></div>
+    <div class="card"><span class="tag">Android</span><h3>Direct download</h3><p>Download the APK and open it. Your phone will ask you to allow installs from your browser.</p><a class="btn" id="android" href="#" aria-disabled="true">Coming soon</a></div>
+    <div class="card"><span class="tag">Any device</span><h3>Web app</h3><p>No install needed. Open it now, or add it to your home screen from the share menu.</p><a class="btn" href="/play/">Open the game</a></div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="eyebrow">Questions</div>
+  <h2>FAQ</h2>
+  <details><summary>Is it really free?</summary><p>Yes. No ads, no accounts and no purchases.</p></details>
+  <details><summary>Is the coin flip fair?</summary><p>Yes. The on-screen coin uses your device's cryptographic random number generator, so it's a true 50/50 every time.</p></details>
+  <details><summary>Does it need internet?</summary><p>Not after the first load. The game works offline, which is handy in a backyard or a basement.</p></details>
+  <details><summary>Where do my photos go?</summary><p>Nowhere. Contestant photos are shrunk and kept on your own device. We never see or upload them.</p></details>
+  <details><summary>How many people can play?</summary><p>Two or more. Byes are handled automatically when the bracket isn't a neat power of two.</p></details>
+  <details><summary>Can I flip a real coin?</summary><p>Yes. Choose "Flip a real coin", flip it on the table, then tap the side that landed.</p></details>
+</section>
+
+<footer>
+  <div>© <span id="yr"></span> Coin Flip Challenge · coinflipchallenge.com</div>
+  <div><a href="/privacy.html">Privacy</a> · <a id="mail" href="#">Contact</a></div>
+</footer>
+</div>
+
+<script src="/config.js"></script>
+<script>
+(function(){
+  var C=window.CFC_CONFIG||{};
+  function wire(id,url,label){var a=document.getElementById(id);if(url){a.href=url;a.removeAttribute('aria-disabled');a.textContent=label;if(id==='android')a.setAttribute('download','');}else{a.addEventListener('click',function(e){e.preventDefault();});}}
+  wire('ios',C.iosTestFlightUrl,'Join the iPhone beta');
+  wire('android',C.androidApkUrl,'Download for Android');
+  document.getElementById('mail').href='mailto:'+(C.contactEmail||'');
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  var disc=document.getElementById('disc'),res=document.getElementById('res'),busy=false,rot=0;
+  var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rnd(){var a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]&1;}
+  document.getElementById('coin').addEventListener('click',function(){
+    if(busy)return;busy=true;var heads=rnd()===0;
+    var dur=rm?200:1800+Math.random()*1200;
+    var from=rot;rot=Math.ceil(from/360)*360+(rm?0:360*(3+Math.floor(Math.random()*3)))+(heads?0:180);
+    res.textContent='Flipping…';
+    var a=disc.animate([{transform:'rotateX('+from+'deg)'},{transform:'rotateX('+rot+'deg)'}],{duration:dur,easing:'cubic-bezier(.1,.55,.2,1)',fill:'forwards'});
+    a.onfinish=function(){res.textContent=heads?'Heads!':'Tails!';busy=false;};
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coin Flip Challenge — Play</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E2B25">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Coin Flip">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<style>
+@font-face{font-family:'Alfa Slab One';font-weight:400;font-display:swap;src:url(../fonts/alfa-slab-one-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-weight:400;font-display:swap;src:url(../fonts/figtree-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-weight:500;font-display:swap;src:url(../fonts/figtree-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-weight:600;font-display:swap;src:url(../fonts/figtree-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-weight:700;font-display:swap;src:url(../fonts/figtree-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-weight:500;font-display:swap;src:url(../fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-weight:600;font-display:swap;src:url(../fonts/ibm-plex-mono-latin-600-normal.woff2) format('woff2')}
+
+/* Layout: one column "program" - masthead, setup or stage, then a scrolling bracket and play-by-play. Dark felt-green first, chalk-white type, brass coin as the only accent. */
+:root{
+  --bg:#0E2B25;
+  --surface:#143830;
+  --surface-2:#1B463C;
+  --line:#2C5B4E;
+  --fg:#F0EBDD;
+  --muted:#A9BFB4;
+  --accent:#E8B93E;
+  --accent-ink:#E8B93E;
+  --on-accent:#2A1F04;
+  --danger:#F4A18C;
+  --font-display:'Alfa Slab One',Georgia,'Times New Roman',serif;
+  --font-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#E9EFEA;--surface:#FFFFFF;--surface-2:#F1F6F2;--line:#C3D3C9;--fg:#10261F;--muted:#46625A;
+    --accent:#D9A21B;--accent-ink:#8A5F00;--on-accent:#2A1F04;--danger:#A33A22;color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#E9EFEA;--surface:#FFFFFF;--surface-2:#F1F6F2;--line:#C3D3C9;--fg:#10261F;--muted:#46625A;
+  --accent:#D9A21B;--accent-ink:#8A5F00;--on-accent:#2A1F04;--danger:#A33A22;color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 var(--font-body);
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:max(56px,env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:22px}
+.eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* masthead */
+.mast{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.mast .mark{width:64px;height:64px;flex:none}
+.mast h1{font:400 clamp(1.9rem,6.4vw,3.4rem)/1 var(--font-display);text-transform:uppercase;margin:0;text-wrap:balance}
+.mast .tag{margin:6px 0 0;color:var(--muted);max-width:46ch}
+.mast .txt{min-width:0}
+
+/* coin art (physical object, same in both themes) */
+.face{
+  background:radial-gradient(circle at 32% 28%,#FFE9A3 0,#E8B93E 48%,#B5821B 100%);
+  box-shadow:inset 0 0 0 6px #C99A2B,inset 0 0 0 9px #F6D677,0 6px 14px rgba(0,0,0,.35);
+  color:#5A3E06;border-radius:50%;
+}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.ph{font:400 1.2rem/1.2 var(--font-display);margin:0 0 14px}
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.how div{padding:2px 0;min-width:0}
+.how b{display:block;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:4px}
+.how span{color:var(--muted);font-size:.95rem}
+@media(max-width:700px){.how{grid-template-columns:1fr}}
+
+/* form */
+label{display:block;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=text],select{
+  width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--fg);
+  border-radius:8px;padding:10px 12px;font:inherit;min-width:0;
+}
+select{appearance:auto}
+input::placeholder{color:var(--muted);opacity:.8}
+:is(button,input,select,textarea):focus-visible{outline:3px solid var(--accent-ink);outline-offset:2px}
+.field{max-width:520px;margin-bottom:16px}
+.note{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:.92rem}
+.chead,.crow{display:grid;grid-template-columns:1.6rem minmax(0,1.1fr) minmax(0,1fr) minmax(0,1.6fr) 110px 2.4rem;gap:8px;align-items:center}
+.chead{margin-bottom:4px}
+.chead label{margin:0}
+.crow{padding-block:6px}
+.num{font-family:var(--font-mono);color:var(--muted);font-size:.85rem;text-align:right}
+.x{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:1.2rem;line-height:1;cursor:pointer}
+.x:hover{border-color:var(--danger);color:var(--danger)}
+@media(max-width:720px){
+  .chead{display:none}
+  .crow{grid-template-columns:1.6rem minmax(0,1fr) 2.4rem;grid-template-areas:"n a x" ". b ." ". c ." ". p .";border-bottom:1px solid var(--line);padding-block:12px}
+  .crow .num{grid-area:n}.in-name{grid-area:a}.in-nick{grid-area:b}.in-cry{grid-area:c}.x{grid-area:x}.pcell{grid-area:p}
+}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:14px}
+.check{display:flex;align-items:center;gap:10px;font-size:.95rem;margin:0 0 14px;text-transform:none;letter-spacing:0;font-family:var(--font-body);color:var(--fg)}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.summary{margin:0 0 6px;color:var(--muted)}
+.fair{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.msg{margin:0 0 10px;min-height:1.4em;color:var(--danger);font-weight:600}
+
+/* buttons */
+.btn{font:600 .95rem var(--font-body);padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--accent-ink)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.big{padding:14px 28px;font-size:1.05rem}
+.btn.ghost{background:transparent}
+.btn.danger{border-color:var(--danger);color:var(--danger);background:transparent}
+.btn:disabled{opacity:.55;cursor:default}
+
+/* play bar */
+.bar{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.ctitle{font:400 1.5rem/1.15 var(--font-display);margin:2px 0 0;overflow-wrap:anywhere}
+.bar-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.confirm{color:var(--muted);font-size:.92rem}
+
+/* stage */
+.stage-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.faceoff{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center}
+.side{padding:14px 12px;border-radius:12px;border:1px solid transparent;text-align:center;min-width:0}
+.side.win{border-color:var(--accent);background:var(--surface-2)}
+.side.lose{opacity:.78}
+.avwrap{display:flex;justify-content:center;margin-bottom:8px}
+.av{display:inline-grid;place-items:center;border-radius:50%;overflow:hidden;flex:none;color:#fff;font-family:var(--font-display);box-shadow:0 0 0 2px var(--line)}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.side.win .av{box-shadow:0 0 0 3px var(--accent)}
+.av.big{box-shadow:0 0 0 4px var(--accent)}
+.runner{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.slot .av{box-shadow:none}
+.pcell{display:flex;gap:6px}
+.pwrap{position:relative;display:inline-block}
+.ptile{width:52px;height:52px;border-radius:10px;border:1px dashed var(--line);background:var(--surface-2);color:var(--muted);font:600 .62rem/1.1 var(--font-mono);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;overflow:hidden;padding:0;display:grid;place-items:center}
+.ptile:hover{border-color:var(--accent-ink)}
+.ptile.has{border-style:solid;border-color:var(--accent-ink)}
+.ptile img{width:100%;height:100%;object-fit:cover;display:block}
+.ptx{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#000;color:#fff;font-size:.85rem;line-height:1;cursor:pointer;padding:0}
+.moment{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(4,16,13,.8);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.moment .fw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mcard{position:relative;z-index:1;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:460px;width:100%;display:grid;gap:10px;justify-items:center;text-align:center;max-height:100%;overflow:auto}
+.mname{font:400 clamp(1.6rem,6vw,2.2rem)/1.05 var(--font-display);margin:0;overflow-wrap:anywhere}
+.mline{margin:0;color:var(--muted)}
+.mout{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.glabel{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.grp{display:grid;gap:10px;align-content:start}
+.matches.gr{gap:18px}
+.all .slot.lost .who{text-decoration:none}
+.awards{margin:0 0 14px}
+.awards summary{cursor:pointer;font-weight:600;margin-bottom:8px}
+.awgrid{display:grid;gap:10px}
+.awrow{display:grid;grid-template-columns:minmax(0,9rem) minmax(0,1fr) minmax(0,1.6fr);gap:8px;align-items:center}
+@media(max-width:700px){.awrow{grid-template-columns:1fr}}
+.stand{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px;width:100%;text-align:left}
+.srow{display:grid;grid-template-columns:3rem minmax(0,1fr) minmax(0,1.1fr);gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.srow.first{border-color:var(--accent)}
+.sp{font-family:var(--font-mono);font-weight:600;font-variant-numeric:tabular-nums}
+.sn{display:flex;align-items:center;gap:10px;min-width:0}
+.snt,.sa{display:grid;min-width:0;overflow-wrap:anywhere}
+.snt i{color:var(--accent-ink)}
+.snt small,.sa small{color:var(--muted)}
+.sa b{color:var(--accent-ink)}
+@media(max-width:640px){.srow{grid-template-columns:3rem minmax(0,1fr)}.srow .sa{grid-column:2}}
+.corner{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nm{font:400 clamp(1.2rem,3.6vw,1.9rem)/1.1 var(--font-display);margin:6px 0 4px;overflow-wrap:anywhere}
+.nk{color:var(--accent-ink);font-weight:600;font-style:italic;overflow-wrap:anywhere}
+.cry{color:var(--muted);font-size:.9rem;margin-top:6px;overflow-wrap:anywhere}
+.pips{display:flex;gap:6px;justify-content:center;margin-top:10px;min-height:14px}
+.pip{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent-ink)}
+.pip.on{background:var(--accent);border-color:var(--accent)}
+.badge{display:inline-block;margin-top:10px;padding:2px 10px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.mid{display:grid;justify-items:center;gap:12px;min-width:170px}
+.coin-zone{height:220px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.coinwrap{perspective:700px}
+.coin{width:128px;height:128px;position:relative;transform-style:preserve-3d}
+.coin .face{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.coin .face.back{transform:rotateX(180deg)}
+.coin .face b{font:400 1.05rem var(--font-display);letter-spacing:.06em}
+.coin .face i{font-style:normal;font-size:1.5rem;line-height:1}
+.callbox{margin:14px auto 0;max-width:62ch;text-align:center}
+.call{font-size:1.15rem;margin:4px 0 0;min-height:3.4em;text-wrap:pretty}
+.stack{display:grid;gap:8px;justify-items:center}
+.real{display:grid;gap:10px;justify-items:center;text-align:center;max-width:300px}
+.real .hint{margin:0;color:var(--muted);font-size:.88rem}
+.real .reading{margin:0;font-weight:600}
+.thumb{width:140px;height:140px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.manual{display:grid;gap:6px;justify-items:center}
+.manual .pair{display:flex;gap:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fixnote{margin:10px 0 0;text-align:center;color:var(--muted);font-size:.92rem}
+@media(max-width:640px){
+  .faceoff{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b" "m m"}
+  .side.a{grid-area:a}.side.b{grid-area:b}.mid{grid-area:m}
+  .coin-zone{height:200px}
+}
+
+/* bracket */
+.bracket{display:flex;gap:18px;overflow-x:auto;padding-bottom:8px}
+.round{display:flex;flex-direction:column;min-width:210px;flex:1 0 210px}
+.round h4{margin:0 0 10px;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.matches{display:flex;flex-direction:column;justify-content:space-around;gap:12px;flex:1}
+.match{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);overflow:hidden}
+.match.cur{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.slot{display:flex;align-items:center;gap:8px;padding:8px 10px;min-width:0}
+.slot+.slot{border-top:1px solid var(--line)}
+.slot .ft{font-family:var(--font-mono);font-size:.68rem;color:var(--muted);width:1ch;flex:none}
+.slot .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .sc{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.slot.empty .who{color:var(--muted);font-style:italic}
+.slot.lost .who{color:var(--muted);text-decoration:line-through}
+.slot.won .who{font-weight:700}
+.slot .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none}
+
+/* log */
+.log{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.log li{display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:10px}
+.log li.champ span:last-child,.log li.win span:last-child{font-weight:600}
+@media(max-width:560px){.log li{grid-template-columns:1fr;gap:2px}}
+
+/* champion */
+.champ{text-align:center;display:grid;justify-items:center;gap:10px}
+.champ .trophy{width:120px;height:120px;display:grid;place-content:center;font-size:3rem}
+.champ-name{font:400 clamp(1.8rem,6vw,3rem)/1.05 var(--font-display);margin:0;overflow-wrap:anywhere}
+.champ-line{max-width:56ch;margin:0;font-size:1.1rem}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+#copybox{width:100%;max-width:520px;min-height:140px;background:var(--surface-2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px;font:.85rem var(--font-mono)}
+.confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+</style>
+
+</head>
+<body>
+<main class="wrap">
+  <header class="mast">
+    <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><radialGradient id="cg" cx=".32" cy=".28" r=".9"><stop offset="0" stop-color="#FFE9A3"/><stop offset=".48" stop-color="#E8B93E"/><stop offset="1" stop-color="#B5821B"/></radialGradient></defs>
+      <circle cx="32" cy="32" r="30" fill="url(#cg)"/>
+      <circle cx="32" cy="32" r="25" fill="none" stroke="#C99A2B" stroke-width="3"/>
+      <path d="M32 17l4.4 9.2 10.1 1.3-7.4 7 1.9 10L32 39.5 23 44.5l1.9-10-7.4-7 10.1-1.3z" fill="#5A3E06"/>
+    </svg>
+    <div class="txt">
+      <div class="eyebrow">Official bracket · luck only</div>
+      <h1>Coin Flip Challenge</h1>
+      <p class="tag">No skill. No excuses. Everybody loses fair and square.</p>
+    </div>
+  </header>
+  <div id="app"></div>
+</main>
+
+<script>
+(function(){
+'use strict';
+var KEY='coinflip-challenge-v1';
+var app=document.getElementById('app');
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function uid(){return Math.random().toString(36).slice(2,9);}
+
+/* fair randomness */
+function rint(n){
+  try{var a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n;}catch(e){return Math.floor(Math.random()*n);}
+}
+function pick(arr){return arr[rint(arr.length)];}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=rint(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* announcer material */
+var FLIP=[
+  function(f,w,l){return 'Up it goes... and it’s '+f+'! '+w+' takes the flip.';},
+  function(f,w,l){return f+'! The crowd goes wild for '+w+'!';},
+  function(f,w,l){return 'The coin has spoken: '+f+'. '+l+' can only watch.';},
+  function(f,w,l){return 'No skill, no strategy, just '+f+'. Point to '+w+'.';},
+  function(f,w,l){return f+'! '+w+' didn’t even have to try.';},
+  function(f,w,l){return 'It spins, it settles, it’s '+f+'. Somebody tell '+l+' it’s nothing personal.';}
+];
+var WIN=[
+  function(w,l,nx){return w+' eliminates '+l+' and moves on to the '+nx+'!';},
+  function(w,l,nx){return 'That’s it! '+w+' advances. '+l+', there’s no shame in this. Pure luck.';},
+  function(w,l,nx){return l+' is out. '+w+' is headed to the '+nx+'. Nobody practiced for this.';},
+  function(w,l,nx){return w+' wins it! '+l+' did everything right and it didn’t matter.';}
+];
+var ALLWIN=[
+  function(w,l,r){return w+' wins it! '+l+' slides down to the next bracket and plays on.';},
+  function(w,l,r){return 'That one goes to '+w+'. '+l+' isn’t out. Everybody plays every round.';},
+  function(w,l,r){return w+' takes the match. '+l+' keeps playing, and every place is still on the line.';}
+];
+var CHAMP=[
+  function(w,t){return w+' is the Coin Flip Champion'+(t?' of '+t:'')+'! Pure, unearned, glorious luck.';},
+  function(w,t){return 'Ladies and gentlemen, your champion: '+w+'. Skill had nothing to do with it.';},
+  function(w,t){return 'It’s over! '+w+' wins it all'+(t?' at '+t:'')+'. Frame the coin.';}
+];
+
+var EXAMPLES=[
+  ['Uncle Dale','The Gambler','I have never lost a flip I didn’t deserve.'],
+  ['Aunt Marcy','Lucky Penny','Heads, tails, I’m winning either way.'],
+  ['Cousin Theo','Two-Face','You can’t read me. There’s nothing to read.'],
+  ['Grandpa Lou','Old Faithful','Fifty years of flips and I’m just warming up.'],
+  ['Nina','The Flipper','Coins fear me.'],
+  ['Big Mike','Quarter Pounder','Bring the change.'],
+  ['Jess','Tails Never Fails','Call it in the air.'],
+  ['Little Sam','Pocket Rocket','Small coin, big dreams.']
+];
+
+function fresh(){
+  return {phase:'setup',title:'Thanksgiving Showdown',example:true,earlyBo:1,finalBo:3,random:true,
+    people:EXAMPLES.map(function(e){return {id:uid(),name:e[0],nick:e[1],cry:e[2]};}),
+    rounds:null,log:[],champion:null};
+}
+function load(){
+  try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if(o&&o.people&&o.phase)return o;}}catch(e){}
+  return null;
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+function defAwards(){
+  return {
+    champ:{t:'Coin Flip Champion',d:'Ruler of pure luck.'},
+    silver:{t:'Silver Flipper',d:'So close to gold.'},
+    bronze:{t:'Bronze Flipper',d:'On the podium. Luck was kind.'},
+    fav:{t:'Fortune’s Favorite',d:'More wins than losses. The coins like you.'},
+    balanced:{t:'Perfectly Balanced',d:'As many wins as losses. The universe approves.'},
+    wait:{t:'Luck in Waiting',d:'Owed one very big flip. It is coming.'},
+    vault:{t:'The Vault',d:'All that luck, saved up for something big.'}
+  };
+}
+var S=load()||fresh();
+S.format=S.format==='all'?'all':'ko';
+(function(){var da=defAwards();if(!S.awards)S.awards={};for(var k in da){if(!S.awards[k]||typeof S.awards[k].t!=='string')S.awards[k]=da[k];}})();
+var ui={focus:null,flipping:false,rot:0,line:'',lineFor:'',confirm:false,realOpen:false,real:{status:'idle',msg:''},thumb:'',fix:null};
+function resetUi(){ui={focus:null,flipping:false,rot:0,line:'',lineFor:'',confirm:false,realOpen:false,real:{status:'idle',msg:''},thumb:'',fix:null};}
+
+/* contestant photos (kept on this device, separate from the bracket state) */
+var PKEY='coinflip-challenge-photos-v1',PH={};
+try{
+  var ps=JSON.parse(localStorage.getItem(PKEY)||'{}');
+  for(var pk in ps){
+    var po0=ps[pk]||{};
+    var pw=typeof po0.w==='string'&&po0.w.indexOf('data:image/')===0?po0.w:'';
+    var pl=typeof po0.l==='string'&&po0.l.indexOf('data:image/')===0?po0.l:'';
+    if(pw||pl)PH[pk]={w:pw,l:pl};
+  }
+}catch(e){}
+function savePhotos(){try{localStorage.setItem(PKEY,JSON.stringify(PH));return true;}catch(e){var m=document.getElementById('msg');if(m)m.textContent='Photos are too big to save on this device. They will work until you close the page.';return false;}}
+function photoFor(id,kind){var o=PH[id];if(!o)return '';return kind==='lose'?(o.l||o.w||''):(o.w||o.l||'');}
+function anyPh(){for(var k in PH){if(PH[k]&&(PH[k].w||PH[k].l)&&P(k))return true;}return false;}
+function ini(name){var w=String(name||'?').trim().split(/\s+/);return ((w[0]||'?').charAt(0)+(w.length>1?w[w.length-1].charAt(0):'')).toUpperCase();}
+function hueOf(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h;}
+function avatarHtml(p,kind,size,cls){
+  var src=photoFor(p.id,kind),st='width:'+size+'px;height:'+size+'px;font-size:'+Math.round(size*.4)+'px';
+  if(src)return '<span class="av '+(cls||'')+'" style="'+st+'"><img src="'+src+'" alt="'+esc(p.name)+'"></span>';
+  return '<span class="av '+(cls||'')+'" style="'+st+';background:hsl('+hueOf(p.name)+' 42% 36%)" aria-hidden="true">'+esc(ini(p.name))+'</span>';
+}
+
+/* people helpers */
+function P(id){if(!id)return null;for(var i=0;i<S.people.length;i++){if(S.people[i].id===id)return S.people[i];}return null;}
+function tag(p){return p.nick&&p.nick.trim()?p.nick.trim():p.name;}
+function full(p){return p.nick&&p.nick.trim()?p.name+' “'+p.nick.trim()+'”':p.name;}
+
+/* bracket logic */
+function seedOrder(size){var o=[1];while(o.length<size){var m=o.length*2+1;var n=[];o.forEach(function(s){n.push(s);n.push(m-s);});o=n;}return o;}
+function newMatch(a,b){return {a:a,b:b,wa:0,wb:0,winner:null,bye:false,flips:[]};}
+function bestOf(r,i){
+  if(S.format==='all')return (r===S.rounds.length-1&&i===0)?S.finalBo:S.earlyBo;
+  return r===S.rounds.length-1?S.finalBo:S.earlyBo;
+}
+function roundName(r){
+  if(S.format==='all')return 'Round '+(r+1);
+  var left=S.rounds.length-r;
+  if(left===1)return 'Final';
+  if(left===2)return 'Semifinals';
+  if(left===3)return 'Quarterfinals';
+  return 'Round of '+Math.pow(2,left);
+}
+function place(r,i,id){
+  if(r+1<S.rounds.length){var nm=S.rounds[r+1][i>>1];if(i%2===0)nm.a=id;else nm.b=id;}
+}
+function addLog(kind,text,r){S.log.push({k:kind,t:text,rn:r===null?'The draw':roundName(r)});if(S.log.length>200)S.log.shift();}
+function build(){
+  var order=S.people.slice();
+  if(S.random)shuffle(order);
+  var n=order.length,size=2;
+  while(size<n)size*=2;
+  var seeds=seedOrder(size);
+  var all=S.format==='all';
+  var slots=seeds.map(function(s){return s<=n?order[s-1].id:(all?BYE:null);});
+  var rounds=[],m=[],i;
+  for(i=0;i<size;i+=2)m.push(newMatch(slots[i],slots[i+1]));
+  rounds.push(m);
+  var cnt=size/2;
+  if(all){
+    var R=Math.round(Math.log2(size));
+    for(var rx=1;rx<R;rx++){var ra=[];for(i=0;i<size/2;i++)ra.push(newMatch(null,null));rounds.push(ra);}
+  }else{
+    while(cnt>1){cnt=cnt/2;var rr=[];for(i=0;i<cnt;i++)rr.push(newMatch(null,null));rounds.push(rr);}
+  }
+  S.rounds=rounds;S.log=[];S.champion=null;S.phase='play';S.size=size;S.n=n;
+  if(all){
+    rounds[0].forEach(function(mt){
+      var real=(mt.a!==BYE?mt.a:null)||(mt.b!==BYE?mt.b:null);
+      if((mt.a===BYE)!==(mt.b===BYE)&&real)addLog('bye',tag(P(real))+' drew a first-round bye.',null);
+    });
+    rounds[0].forEach(function(mt,idx){autoResolve(0,idx);});
+  }
+  else rounds[0].forEach(function(mt,idx){
+    if((!mt.a)!==(!mt.b)){
+      mt.bye=true;mt.winner=mt.a||mt.b;place(0,idx,mt.winner);
+      addLog('bye',tag(P(mt.winner))+' drew a first-round bye.',null);
+    }
+  });
+  resetUi();
+  save();
+}
+var BYE='BYE';
+function nextRef(){
+  if(!S.rounds)return null;
+  var all=S.format==='all';
+  for(var r=0;r<S.rounds.length;r++){
+    var len=S.rounds[r].length;
+    var half=all?S.size/Math.pow(2,r+1):len;
+    var groups=len/half;
+    for(var gg=0;gg<groups;gg++){
+      var g=all?groups-1-gg:gg;
+      for(var k=0;k<half;k++){
+        var i=g*half+k,m=S.rounds[r][i];
+        if(P(m.a)&&P(m.b)&&!m.winner)return {r:r,i:i};
+      }
+    }
+  }
+  return null;
+}
+/* every-place format: winners and losers of each group play on in their own group */
+function groupLabel(r,i){
+  if(S.format!=='all')return '';
+  var half=S.size/Math.pow(2,r+1),g=Math.floor(i/half),span=S.size/Math.pow(2,r);
+  if(S.n===S.size)return 'Places '+(g*span+1)+'–'+((g+1)*span);
+  return 'Bracket '+(g+1);
+}
+function autoResolve(r,i){
+  var m=S.rounds[r][i];
+  if(m.winner)return;
+  if(m.a===null||m.b===null)return;
+  if(m.a===BYE||m.b===BYE){
+    m.bye=true;
+    m.winner=(m.a===BYE)?m.b:m.a;
+    advanceAll(r,i);
+  }
+}
+function advanceAll(r,i){
+  if(r+1>=S.rounds.length)return;
+  var m=S.rounds[r][i];
+  var half=S.size/Math.pow(2,r+1),g=Math.floor(i/half),j=i%half,half2=half/2;
+  var side=(j%2===0)?'a':'b';
+  var wl=m.winner,ll=(m.winner===m.a)?m.b:m.a;
+  var tw=(2*g)*half2+(j>>1),tl=(2*g+1)*half2+(j>>1);
+  S.rounds[r+1][tw][side]=wl;
+  S.rounds[r+1][tl][side]=ll;
+  autoResolve(r+1,tw);
+  autoResolve(r+1,tl);
+}
+function allDone(){
+  for(var r=0;r<S.rounds.length;r++){for(var i=0;i<S.rounds[r].length;i++){if(!S.rounds[r][i].winner)return false;}}
+  return true;
+}
+function standings(){
+  var rec={};
+  S.people.forEach(function(p){rec[p.id]={id:p.id,w:0,l:0,slot:0};});
+  S.rounds.forEach(function(round,r){
+    var val=S.size/Math.pow(2,r+1);
+    round.forEach(function(m){
+      var wi=m.winner,li=(wi===m.a)?m.b:m.a;
+      if(rec[li]){rec[li].slot+=val;if(!m.bye)rec[li].l++;}
+      if(rec[wi]&&!m.bye)rec[wi].w++;
+    });
+  });
+  var list=[];
+  for(var k in rec)list.push(rec[k]);
+  list.sort(function(a,b){return a.slot-b.slot;});
+  return list;
+}
+function awardKey(place,n,r){
+  if(place===1)return 'champ';
+  if(place===n&&n>=3&&r.w===0)return 'vault';
+  if(place===2)return 'silver';
+  if(place===3)return 'bronze';
+  if(r.w+r.l>0&&r.w===r.l)return 'balanced';
+  if(r.w>r.l)return 'fav';
+  return 'wait';
+}
+function ord(n){var s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+var AW_ORDER=[['champ','1st place'],['silver','2nd place'],['bronze','3rd place'],['fav','More wins than losses'],['balanced','Equal wins and losses'],['wait','More losses than wins'],['vault','Last place, no wins']];
+function awardsHtml(){
+  if(S.format!=='all')return '';
+  return '<details class="awards"><summary>Award titles</summary><p class="fair">Every finishing spot gets a title based on place and record. Rename any of them.</p><div class="awgrid">'+
+    AW_ORDER.map(function(x){
+      var a=S.awards[x[0]];
+      return '<div class="awrow"><span class="eyebrow">'+x[1]+'</span>'+
+        '<input type="text" id="aw-t-'+x[0]+'" data-aw="t" data-k="'+x[0]+'" value="'+esc(a.t)+'" maxlength="40" aria-label="'+x[1]+' title" autocomplete="off">'+
+        '<input type="text" id="aw-d-'+x[0]+'" data-aw="d" data-k="'+x[0]+'" value="'+esc(a.d)+'" maxlength="90" aria-label="'+x[1]+' description" autocomplete="off"></div>';
+    }).join('')+'</div></details>';
+}
+function standingsHtml(){
+  var st=standings(),n=st.length,W=P(st[0].id),line=ui.line;
+  if(!line){for(var i=S.log.length-1;i>=0;i--){if(S.log[i].k==='champ'){line=S.log[i].t;break;}}}
+  var rows=st.map(function(r,idx){
+    var p=P(r.id),a=S.awards[awardKey(idx+1,n,r)]||{t:'',d:''};
+    return '<li class="srow'+(idx===0?' first':'')+'"><span class="sp">'+ord(idx+1)+'</span>'+
+      '<span class="sn">'+(anyPh()?avatarHtml(p,'win',36):'')+'<span class="snt"><b>'+esc(p.name)+'</b>'+(p.nick&&p.nick.trim()?'<i>“'+esc(p.nick.trim())+'”</i>':'')+'<small>'+r.w+'–'+r.l+' in matches played</small></span></span>'+
+      '<span class="sa"><b>'+esc(a.t)+'</b><small>'+esc(a.d)+'</small></span></li>';
+  }).join('');
+  return '<section class="panel champ" aria-label="Final standings">'+
+    '<div class="eyebrow">Final standings</div>'+
+    (anyPh()?'<div class="avwrap">'+avatarHtml(W,'win',150,'big')+'</div>':'<div class="face trophy" aria-hidden="true">★</div>')+
+    '<h2 class="champ-name">'+esc(W.name)+'</h2>'+
+    (W.nick&&W.nick.trim()?'<div class="nk">“'+esc(W.nick.trim())+'”</div>':'')+
+    '<p class="champ-line">'+esc(line)+'</p>'+fixHtml()+
+    '<ol class="stand">'+rows+'</ol>'+
+    '<div class="actions">'+
+      '<button class="btn primary" data-act="copy" id="copybtn">Copy results</button>'+
+      '<button class="btn" data-act="again">Run it back</button>'+
+      '<button class="btn ghost" data-act="leave-yes">Edit the field</button>'+
+    '</div>'+
+    '<textarea id="copybox" readonly hidden aria-label="Results text"></textarea>'+
+  '</section>';
+}
+function allResultsText(){
+  var st=standings(),n=st.length,out=[];
+  out.push((S.title||'Coin Flip Challenge')+' final standings');
+  st.forEach(function(r,i){
+    var p=P(r.id),a=S.awards[awardKey(i+1,n,r)]||{t:''};
+    out.push(ord(i+1)+'. '+p.name+(p.nick&&p.nick.trim()?' “'+p.nick.trim()+'”':'')+' ('+r.w+'-'+r.l+') – '+a.t);
+  });
+  out.push('Zero skill involved.');
+  return out.join('\n');
+}
+
+/* summary for setup */
+function summary(){
+  var n=S.people.filter(function(p){return p.name.trim();}).length;
+  if(n<2)return 'Add at least two contestants to build a bracket.';
+  var size=2;while(size<n)size*=2;
+  var R=Math.log2(size),byes=size-n;
+  if(S.format==='all')return n+' contestants, '+R+' round'+(R>1?'s':'')+', up to '+(size/2*R)+' matches. Everyone plays every round and every place gets decided.'+(byes?' Byes are handed out by the draw.':'');
+  return n+' contestants, '+R+' round'+(R>1?'s':'')+(byes?', '+byes+' first-round bye'+(byes>1?'s':'')+' handed out by the draw':', no byes')+'.';
+}
+
+/* ---------- setup view ---------- */
+function boOptions(sel){
+  return [1,3,5,7].map(function(n){return '<option value="'+n+'"'+(n===sel?' selected':'')+'>'+(n===1?'Single flip':'Best of '+n)+'</option>';}).join('');
+}
+function tileHtml(p,kind,label){
+  var o=PH[p.id]||{},src=kind==='w'?o.w:o.l;
+  return '<span class="pwrap"><button type="button" class="ptile'+(src?' has':'')+'" data-act="photo" data-id="'+p.id+'" data-kind="'+kind+'" aria-label="'+(src?'Replace ':'Add ')+label+' photo for '+esc(p.name||'this contestant')+'" title="'+label+' photo">'+(src?'<img src="'+src+'" alt="">':'+ '+label)+'</button>'+
+    (src?'<button type="button" class="ptx" data-act="photo-clear" data-id="'+p.id+'" data-kind="'+kind+'" aria-label="Remove '+label+' photo">×</button>':'')+'</span>';
+}
+function renderSetup(){
+  var rows=S.people.map(function(p,i){
+    return '<div class="crow" data-id="'+p.id+'">'+
+      '<span class="num">'+(i+1)+'</span>'+
+      '<input type="text" class="in-name" id="name-'+p.id+'" data-f="name" value="'+esc(p.name)+'" placeholder="Name" aria-label="Contestant '+(i+1)+' name" maxlength="40" autocomplete="off">'+
+      '<input type="text" class="in-nick" id="nick-'+p.id+'" data-f="nick" value="'+esc(p.nick)+'" placeholder="Nickname" aria-label="Contestant '+(i+1)+' nickname" maxlength="40" autocomplete="off">'+
+      '<input type="text" class="in-cry" id="cry-'+p.id+'" data-f="cry" value="'+esc(p.cry)+'" placeholder="Battle cry (optional)" aria-label="Contestant '+(i+1)+' battle cry" maxlength="90" autocomplete="off">'+
+      '<div class="pcell">'+tileHtml(p,'w','Win')+tileHtml(p,'l','Loss')+'</div>'+
+      '<button class="x" data-act="remove" data-id="'+p.id+'" aria-label="Remove contestant '+(i+1)+'">×</button>'+
+    '</div>';
+  }).join('');
+  app.innerHTML=
+  '<section class="how" aria-label="How it works">'+
+    '<div><b>1 · Enter the field</b><span>Add everyone with a nickname and a battle cry.</span></div>'+
+    '<div><b>2 · Flip for it</b><span>The top name calls Heads, the bottom name calls Tails.</span></div>'+
+    '<div><b>3 · Last one standing</b><span>Win the flip, move on. The final champion owns the bragging rights.</span></div>'+
+  '</section>'+
+  '<section class="panel" aria-labelledby="h-field">'+
+    '<h2 class="ph" id="h-field">The field</h2>'+
+    '<div class="field"><label for="title">Contest name</label><input type="text" id="title" value="'+esc(S.title)+'" maxlength="60" placeholder="Family Reunion Showdown" autocomplete="off"></div>'+
+    (S.example?'<p class="note" id="exbanner">This is an example field. Type over any row, or clear all to enter your own crew.</p>':'')+
+    '<p class="fair">Optional: add a Win photo and a Loss photo for each contestant. They pop up with fireworks when someone advances or gets knocked out, and they stay on this device.</p>'+
+    '<div class="chead"><span></span><label>Name</label><label>Nickname</label><label>Battle cry</label><label>Photos</label><span></span></div>'+
+    '<div id="rows">'+rows+'</div>'+
+    '<div class="row-actions"><button class="btn" data-act="add" id="addbtn">+ Add contestant</button><button class="btn ghost" data-act="clear">Clear all</button></div>'+
+    '<input type="file" class="sr" id="phin" accept="image/*" tabindex="-1" aria-label="Contestant photo">'+
+  '</section>'+
+  '<section class="panel" aria-labelledby="h-rules">'+
+    '<h2 class="ph" id="h-rules">House rules</h2>'+
+    '<div class="rules-grid">'+
+      '<div><label for="format">Format</label><select id="format"><option value="ko"'+(S.format==='ko'?' selected':'')+'>Knockout</option><option value="all"'+(S.format==='all'?' selected':'')+'>Play for every place</option></select></div>'+
+      '<div><label for="earlyBo">'+(S.format==='all'?'Every match except 1st place':'Every round before the final')+'</label><select id="earlyBo">'+boOptions(S.earlyBo)+'</select></div>'+
+      '<div><label for="finalBo">'+(S.format==='all'?'The match for 1st place':'The final')+'</label><select id="finalBo">'+boOptions(S.finalBo)+'</select></div>'+
+    '</div>'+
+    '<label class="check" for="random"><input type="checkbox" id="random"'+(S.random?' checked':'')+'> Draw the bracket at random (otherwise seed in the order listed)</label>'+
+    '<p class="summary" id="summary">'+esc(summary())+'</p>'+awardsHtml()+
+    '<p class="fair">On-screen flips use your device’s secure random generator, so nobody can call it. Prefer the real thing? On any match you can flip a physical coin and tap the side that lands.</p>'+
+    '<p class="msg" id="msg" role="alert"></p>'+
+    '<button class="btn primary big" data-act="start">Start the Challenge</button>'+
+  '</section>';
+}
+
+/* ---------- play view ---------- */
+function slotHtml(m,side,bo){
+  var id=m[side],p=P(id),sc=side==='a'?m.wa:m.wb;
+  var won=m.winner&&m.winner===id,lost=m.winner&&id&&m.winner!==id;
+  var label=p?esc(tag(p)):((m.bye||id===BYE)?'Bye':'To be decided');
+  return '<div class="slot'+(won?' won':'')+(lost?' lost':'')+(p?'':' empty')+'">'+
+    '<span class="ft">'+(m.bye?'':(side==='a'?'H':'T'))+'</span>'+
+    (p&&anyPh()?avatarHtml(p,'win',22):'')+
+    '<span class="who">'+label+'</span>'+
+    (bo>1&&p&&!m.bye?'<span class="sc">'+sc+'</span>':'')+
+    (won&&!m.bye?'<span class="dot" title="Winner"></span>':'')+
+  '</div>';
+}
+function bracketHtml(ref){
+  var cols=S.rounds.map(function(round,r){
+    var all=S.format==='all';
+    var half=all?S.size/Math.pow(2,r+1):round.length;
+    function mh(m,i){
+      var bo=bestOf(r,i),cur=ref&&ref.r===r&&ref.i===i;
+      return '<div class="match'+(cur?' cur':'')+'">'+slotHtml(m,'a',bo)+slotHtml(m,'b',bo)+'</div>';
+    }
+    var ms='';
+    if(!all){ms=round.map(mh).join('');}
+    else{
+      for(var g=0;g<round.length/half;g++){
+        var inner='';
+        for(var k=0;k<half;k++){inner+=mh(round[g*half+k],g*half+k);}
+        ms+='<div class="grp"><div class="glabel">'+esc(groupLabel(r,g*half))+'</div>'+inner+'</div>';
+      }
+    }
+    return '<div class="round"><h4>'+roundName(r)+'</h4><div class="matches'+(all?' gr':'')+'">'+ms+'</div></div>';
+  }).join('');
+  return '<section class="panel" aria-labelledby="h-br"><h2 class="ph" id="h-br">The bracket</h2><div class="bracket'+(S.format==='all'?' all':'')+'">'+cols+'</div></section>';
+}
+function logHtml(){
+  var items=S.log.slice(-14).reverse().map(function(e){
+    return '<li class="'+e.k+'"><span class="eyebrow">'+esc(e.rn)+'</span><span>'+esc(e.t)+'</span></li>';
+  }).join('');
+  if(!items)items='<li><span class="eyebrow">Waiting</span><span>Nothing has been flipped yet.</span></li>';
+  return '<section class="panel" aria-labelledby="h-log"><h2 class="ph" id="h-log">Play-by-play</h2><ul class="log">'+items+'</ul></section>';
+}
+function pipsHtml(need,wins){
+  if(need<2)return '<div class="pips"></div>';
+  var s='';for(var i=0;i<need;i++)s+='<span class="pip'+(i<wins?' on':'')+'"></span>';
+  return '<div class="pips" aria-label="'+wins+' of '+need+' wins">'+s+'</div>';
+}
+function sideHtml(p,side,m,need,done){
+  var wins=side==='a'?m.wa:m.wb;
+  var won=done&&m.winner===p.id,lost=done&&m.winner!==p.id;
+  return '<div class="side '+side+(won?' win':'')+(lost?' lose':'')+'">'+
+    (anyPh()?'<div class="avwrap">'+avatarHtml(p,won?'win':(lost?'lose':'win'),96)+'</div>':'')+
+    '<div class="corner">'+(side==='a'?'Heads corner':'Tails corner')+'</div>'+
+    '<div class="nm">'+esc(p.name)+'</div>'+
+    (p.nick&&p.nick.trim()?'<div class="nk">“'+esc(p.nick.trim())+'”</div>':'')+
+    (p.cry&&p.cry.trim()?'<div class="cry">“'+esc(p.cry.trim())+'”</div>':'')+
+    pipsHtml(need,wins)+
+    (won?'<span class="badge">'+(S.format==='all'?'Winner':'Advances')+'</span>':'')+
+  '</div>';
+}
+function realHtml(m){
+  var A=P(m.a),B=P(m.b);
+  return '<div class="real">'+
+    '<div class="eyebrow">Real coin</div>'+
+    '<p class="hint">Flip your coin, let it land, then tap the side that came up.</p>'+
+    '<div class="stack">'+
+      '<button class="btn primary big" data-act="real-h">Heads: '+esc(tag(A))+'</button>'+
+      '<button class="btn primary big" data-act="real-t">Tails: '+esc(tag(B))+'</button>'+
+    '</div>'+
+    '<button class="btn ghost" data-act="real-cancel">Back</button>'+
+  '</div>';
+}
+function ctrlHtml(m,done){
+  if(done)return '<button class="btn primary big" data-act="next" id="nextbtn">Next match</button>';
+  if(ui.realOpen)return realHtml(m);
+  return '<div class="stack">'+
+    '<button class="btn primary big" data-act="flip" id="flipbtn">'+(m.flips.length?'Flip again on screen':'Flip on screen')+'</button>'+
+    '<button class="btn" data-act="real-open">Flip a real coin</button>'+
+  '</div>';
+}
+function fixHtml(){
+  if(!ui.fix)return '';
+  var read=ui.fix.res==='H'?'HEADS':'TAILS',other=ui.fix.res==='H'?'TAILS':'HEADS';
+  return '<p class="fixnote">Recorded: '+read+'. <button class="btn ghost" data-act="fix">Tapped the wrong one? Switch to '+other+'</button></p>';
+}
+function stageHtml(ref){
+  if(!ref)return '<section class="panel"><p>No matches left to play.</p></section>';
+  var m=S.rounds[ref.r][ref.i],A=P(m.a),B=P(m.b);
+  var bo=bestOf(ref.r,ref.i),need=Math.ceil(bo/2),done=!!m.winner;
+  var key=ref.r+'-'+ref.i;
+  var intro=(S.format==='all'?'Welcome to '+roundName(ref.r)+(S.title?' of '+S.title:'')+'. '+groupLabel(ref.r,ref.i)+(S.n===S.size?' are':' is')+' on the line. ':'Welcome to the '+roundName(ref.r)+(S.title?' of '+S.title:'')+'. ')+'In the Heads corner, '+full(A)+'. In the Tails corner, '+full(B)+'.';
+  var line=ui.lineFor===key&&ui.line?ui.line:intro;
+  var rule=bo>1?'Best of '+bo+', first to '+need:'One flip decides it';
+  return '<section class="panel" aria-label="Current match">'+
+    '<div class="stage-head"><span class="eyebrow">'+roundName(ref.r)+' · '+(S.format==='all'?groupLabel(ref.r,ref.i):'Match '+(ref.i+1)+' of '+S.rounds[ref.r].length)+'</span><span class="eyebrow">'+rule+'</span></div>'+
+    '<div class="faceoff">'+
+      sideHtml(A,'a',m,need,done)+
+      '<div class="mid">'+
+        '<div class="coin-zone"><div class="coinwrap" id="coinwrap"><div class="coin" id="coin" style="transform:rotateX('+ui.rot+'deg)">'+
+          '<div class="face front"><i>★</i><b>HEADS</b></div>'+
+          '<div class="face back"><i>★</i><b>TAILS</b></div>'+
+        '</div></div></div>'+
+        ctrlHtml(m,done)+
+      '</div>'+
+      sideHtml(B,'b',m,need,done)+
+    '</div>'+
+    '<div class="callbox"><div class="eyebrow">Announcer</div><p class="call" id="call" aria-live="polite">'+esc(line)+'</p></div>'+fixHtml()+
+  '</section>';
+}
+function resultsText(){
+  if(S.format==='all')return allResultsText();
+  var out=[];
+  out.push((S.title||'Coin Flip Challenge')+' results');
+  out.push('Champion: '+full(P(S.champion)));
+  S.rounds.forEach(function(round,r){
+    var bo=bestOf(r);
+    round.forEach(function(m){
+      if(m.bye||!m.winner)return;
+      var W=P(m.winner),L=P(m.winner===m.a?m.b:m.a);
+      var ws=m.winner===m.a?m.wa:m.wb,ls=m.winner===m.a?m.wb:m.wa;
+      out.push(roundName(r)+': '+tag(W)+' def. '+tag(L)+(bo>1?' '+ws+'-'+ls:''));
+    });
+  });
+  out.push('Zero skill involved.');
+  return out.join('\n');
+}
+function runnerHtml(){
+  if(!anyPh())return '';
+  var fm=S.rounds[S.rounds.length-1][0];
+  var L=P(fm.winner===fm.a?fm.b:fm.a);
+  if(!L)return '';
+  return '<div class="runner">'+avatarHtml(L,'lose',56)+'<span>Runner-up: '+esc(tag(L))+'</span></div>';
+}
+function champHtml(){
+  if(S.format==='all')return standingsHtml();
+  var W=P(S.champion);
+  var line=ui.line;
+  if(!line){for(var i=S.log.length-1;i>=0;i--){if(S.log[i].k==='champ'){line=S.log[i].t;break;}}}
+  return '<section class="panel champ" aria-label="Champion">'+
+    '<div class="eyebrow">Your champion</div>'+
+    (anyPh()?'<div class="avwrap">'+avatarHtml(W,'win',150,'big')+'</div>':'<div class="face trophy" aria-hidden="true">★</div>')+
+    '<h2 class="champ-name">'+esc(W.name)+'</h2>'+
+    (W.nick&&W.nick.trim()?'<div class="nk">“'+esc(W.nick.trim())+'”</div>':'')+
+    '<p class="champ-line">'+esc(line)+'</p>'+runnerHtml()+fixHtml()+
+    '<div class="actions">'+
+      '<button class="btn primary" data-act="copy" id="copybtn">Copy results</button>'+
+      '<button class="btn" data-act="again">Run it back</button>'+
+      '<button class="btn ghost" data-act="leave-yes">Edit the field</button>'+
+    '</div>'+
+    '<textarea id="copybox" readonly hidden aria-label="Results text"></textarea>'+
+  '</section>';
+}
+function renderPlay(){
+  var ref=S.champion?null:(ui.focus||nextRef());
+  var bar='<div class="bar"><div><div class="eyebrow">Now playing</div><h2 class="ctitle">'+esc(S.title||'Coin Flip Challenge')+'</h2></div><div class="bar-actions">'+
+    (ui.confirm?'<span class="confirm">Leave this bracket?</span><button class="btn danger" data-act="leave-yes">Yes, leave</button><button class="btn ghost" data-act="leave-no">Keep playing</button>'
+      :'<button class="btn ghost" data-act="leave">Back to the field</button>')+
+    '</div></div>';
+  app.innerHTML=bar+(S.champion?champHtml():stageHtml(ref))+bracketHtml(ref)+logHtml();
+}
+function render(){if(S.phase==='setup')renderSetup();else renderPlay();}
+
+/* ---------- flipping ---------- */
+function spin(res){
+  var coin=$('coin'),wrap=$('coinwrap');
+  if(!coin||!coin.animate){ui.rot=res==='T'?180:0;return Promise.resolve();}
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var dur=reduce?300:4000+rint(3001);
+  var spins=reduce?0:Math.round(dur/1000*2.4)+rint(3);
+  var r1=Math.ceil((ui.rot+360*spins)/360)*360+(res==='T'?180:0);
+  var a=coin.animate([{transform:'rotateX('+ui.rot+'deg)'},{transform:'rotateX('+r1+'deg)'}],{duration:dur,easing:'cubic-bezier(.1,.55,.2,1)',fill:'forwards'});
+  if(!reduce&&wrap&&wrap.animate){
+    wrap.animate([{transform:'translateY(0) scale(1)',easing:'cubic-bezier(.2,.7,.3,1)'},{transform:'translateY(-80px) scale(1.18)',offset:.16,easing:'ease-in-out'},{transform:'translateY(-66px) scale(1.14)',offset:.78,easing:'cubic-bezier(.5,0,.8,.6)'},{transform:'translateY(0) scale(1)'}],{duration:dur});
+  }
+  ui.rot=r1%360;
+  return a.finished.then(function(){},function(){});
+}
+function resolveFlip(ref,m,res,real){
+  var A=P(m.a),B=P(m.b);
+  var bo=bestOf(ref.r,ref.i),need=Math.ceil(bo/2);
+  var key=ref.r+'-'+ref.i;
+  m.flips.push(res);
+  if(res==='H')m.wa++;else m.wb++;
+  var face=res==='H'?'HEADS':'TAILS';
+  var w=res==='H'?A:B,l=res==='H'?B:A;
+  var line=(real?pick(['Real coin, real table. ','Straight from a real hand. ']):'')+pick(FLIP)(face,tag(w),tag(l));
+  ui.lineFor=key;
+  if(m.wa<need&&m.wb<need){
+    if(bo>1)line+=' '+tag(A)+' '+m.wa+', '+tag(B)+' '+m.wb+'.';
+    addLog('flip',line,ref.r);ui.line=line;save();return false;
+  }
+  m.winner=m.wa>=need?m.a:m.b;
+  var W=P(m.winner),L=P(m.winner===m.a?m.b:m.a);
+  addLog('flip',line,ref.r);
+  if(S.format==='all'){
+    advanceAll(ref.r,ref.i);
+    if(allDone()){
+      S.champion=standings()[0].id;
+      var cl2=pick(CHAMP)(full(P(S.champion)),S.title);
+      addLog('champ',cl2,ref.r);ui.line=cl2;save();return true;
+    }
+    var wl2=pick(ALLWIN)(tag(W),tag(L),roundName(ref.r));
+    addLog('win',wl2,ref.r);ui.line=line+' '+wl2;ui.focus=ref;save();return false;
+  }
+  if(ref.r===S.rounds.length-1){
+    S.champion=m.winner;
+    var cl=pick(CHAMP)(full(W),S.title);
+    addLog('champ',cl,ref.r);
+    ui.line=cl;save();return true;
+  }
+  place(ref.r,ref.i,m.winner);
+  var wl=pick(WIN)(tag(W),tag(L),roundName(ref.r+1));
+  addLog('win',wl,ref.r);
+  ui.line=line+' '+wl;ui.focus=ref;save();return false;
+}
+function doFlip(){
+  if(ui.flipping||S.champion)return;
+  var ref=ui.focus||nextRef();
+  if(!ref)return;
+  var m=S.rounds[ref.r][ref.i];
+  if(m.winner)return;
+  ui.flipping=true;ui.fix=null;
+  var btn=$('flipbtn');if(btn){btn.disabled=true;btn.textContent='In the air…';}
+  var call=$('call');if(call)call.textContent='And the coin goes up…';
+  var res=rint(2)===0?'H':'T';
+  spin(res).then(function(){
+    ui.flipping=false;
+    var champ=resolveFlip(ref,m,res);
+    render();
+    afterResolve(champ);
+  });
+}
+function confetti(){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var c=document.createElement('canvas');c.className='confetti';document.body.appendChild(c);
+  var ctx=c.getContext('2d'),dpr=window.devicePixelRatio||1,W=window.innerWidth,H=window.innerHeight;
+  c.width=W*dpr;c.height=H*dpr;ctx.scale(dpr,dpr);
+  var cols=['#E8B93E','#F0EBDD','#5FC4A0','#F08A73','#7FB4E8'];
+  var ps=[];
+  for(var i=0;i<150;i++){
+    ps.push({x:W/2+(Math.random()-.5)*200,y:H*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*13-3,s:5+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[rint(cols.length)]});
+  }
+  var t0=performance.now();
+  function f(t){
+    ctx.clearRect(0,0,W,H);
+    ps.forEach(function(p){
+      p.vy+=.28;p.x+=p.vx;p.y+=p.vy;p.vx*=.99;p.r+=p.vr;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);ctx.restore();
+    });
+    if(t-t0<4200)requestAnimationFrame(f);else c.remove();
+  }
+  requestAnimationFrame(f);
+}
+
+/* ---------- real coin: the host taps the side that landed ---------- */
+function shrink(file,max){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var s=Math.min(1,(max||640)/Math.max(img.naturalWidth,img.naturalHeight));
+      var c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(img.naturalWidth*s));c.height=Math.max(1,Math.round(img.naturalHeight*s));
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      try{res(c.toDataURL('image/jpeg',0.8));}catch(e){rej(e);}
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);rej(new Error('bad image'));};
+    img.src=url;
+  });
+}
+function finishReal(res){
+  var ref=ui.focus||nextRef();
+  if(!ref||S.champion)return;
+  var m=S.rounds[ref.r][ref.i];
+  if(m.winner)return;
+  var snap=JSON.stringify({rounds:S.rounds,log:S.log,champion:S.champion});
+  ui.flipping=false;ui.realOpen=false;ui.rot=res==='T'?180:0;
+  var champ=resolveFlip(ref,m,res,true);
+  ui.fix={snap:snap,ref:ref,res:res};
+  render();
+  afterResolve(champ);
+}
+function fixLast(){
+  var f=ui.fix;if(!f)return;
+  var o=JSON.parse(f.snap);
+  S.rounds=o.rounds;S.log=o.log;S.champion=o.champion;
+  ui.focus=null;ui.line='';ui.lineFor='';
+  var res=f.res==='H'?'T':'H';
+  ui.rot=res==='T'?180:0;
+  var m=S.rounds[f.ref.r][f.ref.i];
+  var champ=resolveFlip(f.ref,m,res,true);
+  ui.fix=null;
+  render();
+  afterResolve(champ);
+}
+
+/* ---------- photos, fireworks, result popup ---------- */
+var photoTarget=null;
+async function handlePersonPhoto(file){
+  var tg=photoTarget;photoTarget=null;
+  if(!file||!tg||S.phase!=='setup')return;
+  var d;
+  try{d=await shrink(file,360);}
+  catch(e){var m=$('msg');if(m)m.textContent='That photo couldn’t be used. Try another one.';return;}
+  var o=PH[tg.id]||(PH[tg.id]={w:'',l:''});
+  o[tg.kind]=d;
+  savePhotos();
+  renderSetup();
+}
+function fireworks(ms,canvas,alive){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var own=!canvas,c=canvas;
+  if(own){c=document.createElement('canvas');c.className='confetti';document.body.appendChild(c);}
+  var ctx=c.getContext('2d'),dpr=window.devicePixelRatio||1,W=window.innerWidth,H=window.innerHeight;
+  c.width=W*dpr;c.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  var cols=['#E8B93E','#FFE9A3','#F0EBDD','#5FC4A0','#F08A73','#7FB4E8','#C58BE8'];
+  var rockets=[],sparks=[],t0=performance.now(),last=t0,next=t0+150;
+  function burst(x,y){
+    var col=cols[rint(cols.length)],n=60+rint(40);
+    for(var i=0;i<n;i++){
+      var a=Math.PI*2*i/n+Math.random()*.2,s=1.5+Math.random()*4.5;
+      sparks.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,d:.012+Math.random()*.012,c:Math.random()<.2?'#FFFFFF':col});
+    }
+  }
+  function f(t){
+    if(alive&&!alive())return;
+    var k=Math.min(40,t-last)/16.67;last=t;
+    ctx.clearRect(0,0,W,H);
+    if(t-t0<ms-1200&&t>=next){
+      rockets.push({x:W*(.12+Math.random()*.76),y:H,vy:-(H/60+Math.random()*4),ty:H*(.12+Math.random()*.35)});
+      next=t+280+Math.random()*520;
+    }
+    rockets=rockets.filter(function(r){
+      r.y+=r.vy*k;r.vy*=.985;
+      ctx.globalAlpha=1;ctx.fillStyle='#FFE9A3';ctx.fillRect(r.x-1.5,r.y,3,8);
+      if(r.y<=r.ty||r.vy>-2){burst(r.x,r.y);return false;}
+      return true;
+    });
+    sparks=sparks.filter(function(s){
+      s.x+=s.vx*k;s.y+=s.vy*k;s.vy+=.05*k;s.vx*=.985;s.life-=s.d*k;
+      if(s.life<=0)return false;
+      ctx.globalAlpha=Math.max(0,s.life);ctx.fillStyle=s.c;ctx.beginPath();ctx.arc(s.x,s.y,2.2,0,6.283);ctx.fill();
+      return true;
+    });
+    ctx.globalAlpha=1;
+    if(t-t0<ms||rockets.length||sparks.length)requestAnimationFrame(f);
+    else if(own)c.remove();
+  }
+  requestAnimationFrame(f);
+}
+function closeMoment(){var el=document.getElementById('moment');if(el)el.remove();}
+function showMoment(W,L,f){
+  closeMoment();
+  var el=document.createElement('div');
+  el.className='moment';el.id='moment';
+  el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','Match result');
+  el.innerHTML='<canvas class="fw"></canvas><div class="mcard">'+
+    '<div class="eyebrow">'+esc(roundName(f.r))+' · '+(S.format==='all'?'match winner':'advances')+'</div>'+
+    '<div class="avwrap">'+avatarHtml(W,'win',170,'big')+'</div>'+
+    '<h3 class="mname">'+esc(W.name)+'</h3>'+
+    '<p class="mline">'+esc(ui.line||'')+'</p>'+
+    '<div class="mout">'+avatarHtml(L,'lose',64)+'<span>'+(S.format==='all'?'Plays on: ':'Eliminated: ')+esc(tag(L))+'</span></div>'+
+    '<button type="button" class="btn primary big" id="mclose">Continue</button></div>';
+  document.body.appendChild(el);
+  var b=el.querySelector('#mclose');
+  if(b)b.focus();
+  fireworks(4200,el.querySelector('canvas'),function(){return document.body.contains(el);});
+  el.addEventListener('click',function(e){if(e.target===el||e.target===b)closeMoment();});
+}
+function afterResolve(champ){
+  if(champ){confetti();fireworks(5200);return;}
+  var f=ui.focus;
+  if(!f)return;
+  var m=S.rounds[f.r][f.i];
+  if(!m.winner)return;
+  var W=P(m.winner),L=P(m.winner===m.a?m.b:m.a);
+  if(!W||!L)return;
+  if(anyPh()&&(photoFor(W.id,'win')||photoFor(L.id,'lose')))showMoment(W,L,f);
+}
+
+/* ---------- events ---------- */
+function toSetup(){
+  S.phase='setup';S.rounds=null;S.champion=null;S.log=[];resetUi();save();render();
+}
+function addRow(){
+  if(S.people.length>=32){var m=$('msg');if(m)m.textContent='The bracket tops out at 32 contestants.';return;}
+  S.people.push({id:uid(),name:'',nick:'',cry:''});
+  save();renderSetup();
+  var rows=document.querySelectorAll('#rows .crow');
+  var last=rows[rows.length-1];
+  if(last){var inp=last.querySelector('.in-name');if(inp)inp.focus();}
+}
+function onField(e){
+  if(S.phase!=='setup')return;
+  var t=e.target;
+  var row=t.closest&&t.closest('.crow');
+  if(row){
+    var p=P(row.dataset.id);
+    if(p&&t.dataset.f){
+      p[t.dataset.f]=t.value;
+      if(S.example){S.example=false;var b=$('exbanner');if(b)b.remove();}
+    }
+  }else if(t.id==='title'){S.title=t.value;}
+  else if(t.id==='format'){S.format=t.value==='all'?'all':'ko';save();renderSetup();return;}
+  else if(t.dataset&&t.dataset.aw&&S.awards[t.dataset.k]){S.awards[t.dataset.k][t.dataset.aw]=t.value;}
+  else if(t.id==='earlyBo'){S.earlyBo=parseInt(t.value,10)||1;}
+  else if(t.id==='finalBo'){S.finalBo=parseInt(t.value,10)||1;}
+  else if(t.id==='random'){S.random=t.checked;}
+  else return;
+  var sm=$('summary');if(sm)sm.textContent=summary();
+  save();
+}
+app.addEventListener('input',onField);
+app.addEventListener('change',onField);
+app.addEventListener('change',function(e){
+  var t=e.target;
+  if(t&&t.id==='phin'){var pf=t.files&&t.files[0];t.value='';handlePersonPhoto(pf);}
+});
+app.addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;
+  var t=e.target,row=t.closest&&t.closest('.crow');
+  if(!row)return;
+  e.preventDefault();
+  var next=row.nextElementSibling;
+  if(next){var same=next.querySelector('[data-f="'+t.dataset.f+'"]');if(same)same.focus();}
+  else addRow();
+});
+app.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');
+  if(!b)return;
+  var act=b.dataset.act;
+  if(act==='add'){addRow();}
+  else if(act==='remove'){
+    S.people=S.people.filter(function(p){return p.id!==b.dataset.id;});
+    delete PH[b.dataset.id];savePhotos();
+    S.example=false;save();renderSetup();
+  }
+  else if(act==='clear'){
+    S.people=[{id:uid(),name:'',nick:'',cry:''},{id:uid(),name:'',nick:'',cry:''}];
+    PH={};savePhotos();
+    S.example=false;save();renderSetup();
+    var f=document.querySelector('#rows .in-name');if(f)f.focus();
+  }
+  else if(act==='start'){
+    var named=S.people.filter(function(p){return p.name.trim();});
+    if(named.length<2){var m=$('msg');if(m)m.textContent='Add at least two contestants to build a bracket.';return;}
+    if(named.length>32){var m2=$('msg');if(m2)m2.textContent='The bracket tops out at 32 contestants.';return;}
+    S.people=named.map(function(p){return {id:p.id,name:p.name.trim(),nick:(p.nick||'').trim(),cry:(p.cry||'').trim()};});
+    S.example=false;
+    build();render();
+    window.scrollTo({top:0});
+  }
+  else if(act==='flip'){doFlip();}
+  else if(act==='next'){ui.focus=null;ui.line='';ui.lineFor='';ui.fix=null;render();}
+  else if(act==='real-open'){ui.realOpen=true;ui.real={status:'idle',msg:''};ui.fix=null;render();}
+  else if(act==='real-cancel'){if(ui.flipping)return;ui.realOpen=false;render();}
+  else if(act==='real-h'){if(!ui.flipping)finishReal('H');}
+  else if(act==='real-t'){if(!ui.flipping)finishReal('T');}
+  else if(act==='fix'){fixLast();}
+  else if(act==='photo'){photoTarget={id:b.dataset.id,kind:b.dataset.kind};var pin2=$('phin');if(pin2)pin2.click();}
+  else if(act==='photo-clear'){
+    var po=PH[b.dataset.id];
+    if(po){po[b.dataset.kind]='';if(!po.w&&!po.l)delete PH[b.dataset.id];}
+    savePhotos();renderSetup();
+  }
+  else if(act==='leave'){ui.confirm=true;render();}
+  else if(act==='leave-no'){ui.confirm=false;render();}
+  else if(act==='leave-yes'){toSetup();}
+  else if(act==='again'){build();render();window.scrollTo({top:0});}
+  else if(act==='copy'){
+    var text=resultsText();
+    var box=$('copybox');
+    function fallback(){if(box){box.hidden=false;box.value=text;box.focus();box.select();}}
+    try{
+      navigator.clipboard.writeText(text).then(function(){b.textContent='Copied!';},fallback);
+    }catch(err){fallback();}
+  }
+});
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMoment();});
+render();
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){window.addEventListener('load',function(){navigator.serviceWorker.register('../sw.js').catch(function(){});});}
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><radialGradient id="bg" cx=".5" cy=".42" r=".8"><stop offset="0" stop-color="#1B463C"/><stop offset="1" stop-color="#0B231E"/></radialGradient></defs><rect width="1024" height="1024" fill="url(#bg)"/><defs><radialGradient id="ga" cx=".32" cy=".28" r=".9"><stop offset="0" stop-color="#FFE9A3"/><stop offset=".48" stop-color="#E8B93E"/><stop offset="1" stop-color="#B5821B"/></radialGradient></defs>
+  <circle cx="512" cy="524.6" r="360" fill="#000" opacity=".28"/>
+  <circle cx="512" cy="512" r="360" fill="url(#ga)"/>
+  <circle cx="512" cy="512" r="309.6" fill="none" stroke="#C99A2B" stroke-width="16.2"/>
+  <circle cx="512" cy="512" r="288" fill="none" stroke="#F6D677" stroke-width="6.4799999999999995"/>
+  <polygon points="512.0,339.2 554.3,453.8 676.3,458.6 580.5,534.2 613.6,651.8 512.0,584.0 410.4,651.8 443.5,534.2 347.7,458.6 469.7,453.8" fill="#5A3E06"/></svg>
