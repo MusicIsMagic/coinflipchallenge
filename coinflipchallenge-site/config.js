@@ -3,7 +3,7 @@ window.CFC_CONFIG = {
   // Paste your public TestFlight link here, e.g. "https://testflight.apple.com/join/XXXXXXXX"
   iosTestFlightUrl: "",
   // After you build the Android APK, put it in /downloads and set e.g. "/downloads/coin-flip-challenge-beta.apk"
-  androidApkUrl: "",
+  androidApkUrl: "https://github.com/MusicIsMagic/coinflip-app/releases/latest/download/coin-flip-challenge-beta.apk",
   // Shown on the privacy page and in the footer
   contactEmail: "Troy@CoinFlipChallenge.com"
 };

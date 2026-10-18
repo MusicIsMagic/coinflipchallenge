@@ -1,5 +1,5 @@
 /* Offline cache for Coin Flip Challenge. Bump VERSION when files change. */
-var VERSION='cfc-v1';
+var VERSION='cfc-v5';
 var FILES=['/','/index.html','/play/','/play/index.html','/privacy.html','/site.css','/config.js','/manifest.webmanifest',
 '/icons/favicon.svg','/icons/icon-192.png','/icons/icon-512.png','/icons/apple-touch-icon.png',
 '/fonts/alfa-slab-one-latin-400-normal.woff2','/fonts/figtree-latin-400-normal.woff2','/fonts/figtree-latin-500-normal.woff2','/fonts/figtree-latin-600-normal.woff2','/fonts/figtree-latin-700-normal.woff2','/fonts/ibm-plex-mono-latin-500-normal.woff2','/fonts/ibm-plex-mono-latin-600-normal.woff2'];

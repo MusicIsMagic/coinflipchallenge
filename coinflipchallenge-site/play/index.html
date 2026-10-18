@@ -56,7 +56,7 @@ body{
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));
 }
-.wrap{max-width:1120px;margin:0 auto;display:grid;gap:22px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
 .eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 
 /* masthead */
@@ -132,7 +132,7 @@ input::placeholder{color:var(--muted);opacity:.8}
 /* stage */
 .stage-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .faceoff{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center}
-.side{padding:14px 12px;border-radius:12px;border:1px solid transparent;text-align:center;min-width:0}
+.side{align-self:start;padding:14px 12px;border-radius:12px;border:1px solid transparent;text-align:center;min-width:0}
 .side.win{border-color:var(--accent);background:var(--surface-2)}
 .side.lose{opacity:.78}
 .avwrap{display:flex;justify-content:center;margin-bottom:8px}
@@ -190,6 +190,44 @@ input::placeholder{color:var(--muted);opacity:.8}
 .coin .face.back{transform:rotateX(180deg)}
 .coin .face b{font:400 1.05rem var(--font-display);letter-spacing:.06em}
 .coin .face i{font-style:normal;font-size:1.5rem;line-height:1}
+.scriptbox{margin:16px auto 0;max-width:62ch;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.scriptbox .shead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.btn.small{min-height:36px;padding:0 14px;font-size:.85rem}
+.slines{margin-top:8px;text-align:center}
+.slines p{margin:.25em 0;font-size:1.12rem;text-wrap:balance}
+.slines p:first-child{font-family:var(--font-display)}
+#printsheet{display:none}
+@media print{
+  @page{size:landscape;margin:.45in}
+  body>*:not(#printsheet){display:none!important}
+  html,body{background:#fff!important}
+  body{padding:0!important}
+  #printsheet{display:block!important;color:#111;background:#fff;font-family:var(--font-body);
+    --bg:#fff;--surface:#fff;--surface-2:#fff;--line:#8a8a8a;--fg:#111;--muted:#444;--accent:#B8860B;--accent-ink:#7a5200;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printsheet .panel{border:0;padding:0;background:none}
+  #printsheet .ph{display:none}
+  #printsheet .match{break-inside:avoid;border-color:#555}
+  #printsheet .slot.won{background:#F6E7B0}
+  #printsheet .slot .who{overflow:visible;text-overflow:clip}
+  #printsheet .slot .av{display:none}
+  .pr-head{text-align:center;border-bottom:3px double #111;padding-bottom:8px;margin-bottom:12px}
+  .pr-eyebrow{font:600 10px var(--font-mono);letter-spacing:.2em;text-transform:uppercase;color:#7a5200}
+  .pr-head h1{font:400 30px/1.1 var(--font-display);margin:4px 0 2px}
+  .pr-date{font-size:12px;color:#444}
+  .pr-champ{display:flex;align-items:center;gap:14px;justify-content:center;margin:0 0 14px;padding:10px;border:2px solid #B8860B;border-radius:12px;background:#FFF6D6}
+  .pr-star{font-size:40px;color:#B8860B;line-height:1}
+  .pr-label{font:600 10px var(--font-mono);letter-spacing:.2em;text-transform:uppercase;color:#7a5200}
+  .pr-cname{font:400 26px/1.1 var(--font-display)}
+  .pr-nick{font-style:italic;font-weight:600;color:#7a5200}
+  .pr-run{font-size:12px;color:#444;margin-top:2px}
+  .pr-stand{list-style:none;margin:16px 0 0;padding:0;columns:2;column-gap:28px;font-size:13px}
+  .pr-stand li{display:grid;grid-template-columns:34px 1fr auto auto;gap:8px;padding:3px 0;border-bottom:1px dotted #999;break-inside:avoid}
+  .pr-pl{font-family:var(--font-mono);font-weight:600}
+  .pr-aw{font-style:italic;color:#7a5200}
+  .pr-rec{font-family:var(--font-mono);color:#444}
+  .pr-foot{text-align:center;font-size:11px;color:#555;margin-top:14px}
+}
 .callbox{margin:14px auto 0;max-width:62ch;text-align:center}
 .call{font-size:1.15rem;margin:4px 0 0;min-height:3.4em;text-wrap:pretty}
 .stack{display:grid;gap:8px;justify-items:center}
@@ -337,8 +375,8 @@ function defAwards(){
 var S=load()||fresh();
 S.format=S.format==='all'?'all':'ko';
 (function(){var da=defAwards();if(!S.awards)S.awards={};for(var k in da){if(!S.awards[k]||typeof S.awards[k].t!=='string')S.awards[k]=da[k];}})();
-var ui={focus:null,flipping:false,rot:0,line:'',lineFor:'',confirm:false,realOpen:false,real:{status:'idle',msg:''},thumb:'',fix:null};
-function resetUi(){ui={focus:null,flipping:false,rot:0,line:'',lineFor:'',confirm:false,realOpen:false,real:{status:'idle',msg:''},thumb:'',fix:null};}
+var ui={focus:null,flipping:false,rot:0,line:'',lineFor:'',confirm:false,realOpen:false,real:{status:'idle',msg:''},thumb:'',fix:null,sv:0};
+function resetUi(){ui={focus:null,flipping:false,rot:0,line:'',lineFor:'',confirm:false,realOpen:false,real:{status:'idle',msg:''},thumb:'',fix:null,sv:0};}
 
 /* contestant photos (kept on this device, separate from the bracket state) */
 var PKEY='coinflip-challenge-photos-v1',PH={};
@@ -526,7 +564,9 @@ function standingsHtml(){
     '<p class="champ-line">'+esc(line)+'</p>'+fixHtml()+
     '<ol class="stand">'+rows+'</ol>'+
     '<div class="actions">'+
-      '<button class="btn primary" data-act="copy" id="copybtn">Copy results</button>'+
+      '<button class="btn primary" data-act="print">Print winners’ bracket</button>'+
+      '<button class="btn" data-act="copy" id="copybtn">Copy results</button>'+
+      '<button class="btn" data-act="newgame">New game</button>'+
       '<button class="btn" data-act="again">Run it back</button>'+
       '<button class="btn ghost" data-act="leave-yes">Edit the field</button>'+
     '</div>'+
@@ -689,6 +729,27 @@ function fixHtml(){
   var read=ui.fix.res==='H'?'HEADS':'TAILS',other=ui.fix.res==='H'?'TAILS':'HEADS';
   return '<p class="fixnote">Recorded: '+read+'. <button class="btn ghost" data-act="fix">Tapped the wrong one? Switch to '+other+'</button></p>';
 }
+/* Ring-announcer script: short, read-aloud intro for people who don't want to improvise. Lines are shown one per row. */
+function cryOf(p){return p.cry&&p.cry.trim()?'“'+p.cry.trim()+'”':'';}
+function scriptLines(ref,m,A,B,bo,need){
+  var fa=full(A),fb=full(B),ca=cryOf(A),cb=cryOf(B);
+  var rn=roundName(ref.r),ev=S.title?' of '+S.title:'';
+  var grp=S.format==='all'?groupLabel(ref.r,ref.i):'';
+  var rule=bo>1?'Best of '+bo+'. First to '+need+' takes it!':'One flip. One winner. No second chances!';
+  var stakes=S.format==='all'&&grp?grp+(S.n===S.size?' are':' is')+' on the line!':'';
+  var T=[
+    function(){return ['Ladies and gentlemen!','Welcome to the '+rn+ev+'!',stakes,rule,'In the Heads corner...',fa+'!',ca,'And in the Tails corner...',fb+'!',cb,'Let’s get ready to flip!'];},
+    function(){return ['Ladies and gentlemen, the moment you’ve waited for!',rn+ev+'!',stakes,'Introducing, first, the challenger in the Heads corner...',fa+'!',ca,'And their opponent, in the Tails corner...',fb+'!',cb,rule,'Let the coin decide!'];},
+    function(){return ['Quiet down, everybody!',rn+ev+', coming right up!',stakes,'Calling Heads... '+fa+'!',ca,'Calling Tails... '+fb+'!',cb,rule,'No skill. No excuses. Flip it!'];},
+    function(){return ['It’s time!','It’s showtime!','This is the '+rn+ev+'!',stakes,'Standing in the Heads corner... '+fa+'!',ca,'And standing in the Tails corner... '+fb+'!',cb,rule,'May the best coin win!'];}
+  ];
+  var h=0,k=ref.r+'-'+ref.i;for(var i=0;i<k.length;i++)h=(h*31+k.charCodeAt(i))%1000;
+  return T[(h+ui.sv)%T.length]().filter(function(x){return x&&x.trim();});
+}
+function scriptHtml(lines){
+  return '<div class="scriptbox"><div class="shead"><span class="eyebrow">Read aloud · Ring announcer</span><button class="btn ghost small" data-act="script">Different script</button></div>'+
+    '<div class="slines">'+lines.map(function(l){return '<p>'+esc(l)+'</p>';}).join('')+'</div></div>';
+}
 function stageHtml(ref){
   if(!ref)return '<section class="panel"><p>No matches left to play.</p></section>';
   var m=S.rounds[ref.r][ref.i],A=P(m.a),B=P(m.b);
@@ -710,7 +771,7 @@ function stageHtml(ref){
       '</div>'+
       sideHtml(B,'b',m,need,done)+
     '</div>'+
-    '<div class="callbox"><div class="eyebrow">Announcer</div><p class="call" id="call" aria-live="polite">'+esc(line)+'</p></div>'+fixHtml()+
+    (!done&&!m.flips.length?scriptHtml(scriptLines(ref,m,A,B,bo,need))+'<p class="call" id="call" aria-live="polite" hidden></p>':'<div class="callbox"><div class="eyebrow">Announcer</div><p class="call" id="call" aria-live="polite">'+esc(line)+'</p></div>')+fixHtml()+
   '</section>';
 }
 function resultsText(){
@@ -749,12 +810,45 @@ function champHtml(){
     (W.nick&&W.nick.trim()?'<div class="nk">“'+esc(W.nick.trim())+'”</div>':'')+
     '<p class="champ-line">'+esc(line)+'</p>'+runnerHtml()+fixHtml()+
     '<div class="actions">'+
-      '<button class="btn primary" data-act="copy" id="copybtn">Copy results</button>'+
+      '<button class="btn primary" data-act="print">Print winners’ bracket</button>'+
+      '<button class="btn" data-act="copy" id="copybtn">Copy results</button>'+
+      '<button class="btn" data-act="newgame">New game</button>'+
       '<button class="btn" data-act="again">Run it back</button>'+
       '<button class="btn ghost" data-act="leave-yes">Edit the field</button>'+
     '</div>'+
     '<textarea id="copybox" readonly hidden aria-label="Results text"></textarea>'+
   '</section>';
+}
+/* ---------- printable winners' bracket ---------- */
+function printSheetHtml(){
+  var all=S.format==='all',st=all?standings():null,n=st?st.length:0;
+  var W=P(all?st[0].id:S.champion);
+  var date=''; try{date=new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});}catch(e){}
+  var runner='';
+  if(!all){var fm=S.rounds[S.rounds.length-1][0],L=P(fm.winner===fm.a?fm.b:fm.a);if(L)runner='<div class="pr-run">Runner-up: '+esc(full(L))+'</div>';}
+  var rows='';
+  if(all){
+    rows='<ol class="pr-stand">'+st.map(function(r,i){
+      var p=P(r.id),a=S.awards[awardKey(i+1,n,r)]||{t:''};
+      return '<li><span class="pr-pl">'+ord(i+1)+'</span><span class="pr-nm">'+esc(full(p))+'</span><span class="pr-aw">'+esc(a.t)+'</span><span class="pr-rec">'+r.w+'–'+r.l+'</span></li>';
+    }).join('')+'</ol>';
+  }
+  return '<div class="pr-head"><div class="pr-eyebrow">Official bracket · luck only</div>'+
+    '<h1>'+esc(S.title||'Coin Flip Challenge')+'</h1>'+(date?'<div class="pr-date">'+esc(date)+'</div>':'')+'</div>'+
+    '<div class="pr-champ"><div class="pr-star">★</div><div><div class="pr-label">'+(all?'First place':'Champion')+'</div>'+
+      '<div class="pr-cname">'+esc(W.name)+'</div>'+(W.nick&&W.nick.trim()?'<div class="pr-nick">“'+esc(W.nick.trim())+'”</div>':'')+runner+'</div></div>'+
+    bracketHtml(null)+rows+
+    '<div class="pr-foot">Zero skill involved. · coinflipchallenge.com</div>';
+}
+function openPrint(){
+  var old=$('printsheet');if(old)old.remove();
+  var d=document.createElement('div');d.id='printsheet';d.innerHTML=printSheetHtml();document.body.appendChild(d);
+  /* shrink wide brackets to fit one landscape page */
+  var br=d.querySelector('.bracket');
+  if(br){br.style.overflow='visible';var w=br.scrollWidth;if(w>940)br.style.zoom=String(Math.max(.35,940/w));}
+  var done=function(){var x=$('printsheet');if(x)x.remove();window.removeEventListener('afterprint',done);};
+  window.addEventListener('afterprint',done);
+  setTimeout(function(){try{window.print();}catch(e){done();}},60);
 }
 function renderPlay(){
   var ref=S.champion?null:(ui.focus||nextRef());
@@ -827,7 +921,7 @@ function doFlip(){
   if(m.winner)return;
   ui.flipping=true;ui.fix=null;
   var btn=$('flipbtn');if(btn){btn.disabled=true;btn.textContent='In the air…';}
-  var call=$('call');if(call)call.textContent='And the coin goes up…';
+  var call=$('call');if(call){call.hidden=false;call.textContent='And the coin goes up…';}var sbx=document.querySelector('.scriptbox');if(sbx)sbx.hidden=true;
   var res=rint(2)===0?'H':'T';
   spin(res).then(function(){
     ui.flipping=false;
@@ -1057,7 +1151,15 @@ app.addEventListener('click',function(e){
     window.scrollTo({top:0});
   }
   else if(act==='flip'){doFlip();}
-  else if(act==='next'){ui.focus=null;ui.line='';ui.lineFor='';ui.fix=null;render();}
+  else if(act==='print'){openPrint();}
+  else if(act==='newgame'){
+    S.people=[{id:uid(),name:'',nick:'',cry:''},{id:uid(),name:'',nick:'',cry:''}];
+    S.title='';S.example=false;PH={};savePhotos();
+    toSetup();window.scrollTo({top:0});
+    var f=document.querySelector('#rows .in-name');if(f)f.focus();
+  }
+  else if(act==='script'){ui.sv++;render();}
+  else if(act==='next'){ui.focus=null;ui.line='';ui.lineFor='';ui.fix=null;ui.sv=0;render();}
   else if(act==='real-open'){ui.realOpen=true;ui.real={status:'idle',msg:''};ui.fix=null;render();}
   else if(act==='real-cancel'){if(ui.flipping)return;ui.realOpen=false;render();}
   else if(act==='real-h'){if(!ui.flipping)finishReal('H');}
